@@ -17,11 +17,19 @@ JNIEXPORT jint JNICALL Java_LibSgxJava_SgxFunction_jni_1initialize_1enclave
 
 /*
  * Class:     LibSgxJava_SgxFunction
- * Method:    jni_ecall_sgx_read_rand
+ * Method:    jni_ecall_decrypt
  * Signature: ([B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1sgx_1read_1rand
-  (JNIEnv *, jobject, jbyteArray);
+JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1decrypt
+  (JNIEnv *, jobject, jlong, jbyte);
+
+/*
+ * Class:     LibSgxJava_SgxFunction
+ * Method:    jni_ecall_decrypt
+ * Signature: ([B)[B
+ */
+JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1encrypt
+  (JNIEnv *, jobject, jlong, jbyte);
 
 /*
  * Class:     LibSgxJava_SgxFunction

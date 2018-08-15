@@ -44,7 +44,7 @@ Java_App := $(Java_App_Name:.class=)
      ## LibSgxJava ##
 LibSgxJava_Java_Files := $(wildcard LibSgxJava/*.java)
 LibSgxJava_Java_Classes := $(LibSgxJava_Java_Files:.java=.class)
-Jni_Flags := -I/usr/lib/jvm/java-1.8.0-openjdk-amd64/include/ -I/usr/lib/jvm/java-1.8.0-openjdk-amd64/include/linux
+Jni_Flags := -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/ -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/linux
 
      ## LibSgxJni ##
 LibSgxJni_Cpp_Files := $(wildcard LibSgxJni/*.cpp)
@@ -95,11 +95,9 @@ else
 endif
 Crypto_Library_Name := sgx_tcrypto
 
-Enclave_Cpp_Files := Enclave/Enclave.cpp $(wildcard Enclave/Edger8rSyntax/*.cpp) $(wildcard Enclave/TrustedLibrary/*.cpp)
-Enclave_Include_Paths := -IInclude -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
-
+Enclave_C_Files := Enclave/Enclave.c $(wildcard Enclave/Crypto/*.c)
+Enclave_Include_Paths := -IInclude -IEnclave -IEnclave/Crypto -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -fstack-protector $(Enclave_Include_Paths)
-Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++03 -nostdinc++
 
 # To generate a proper enclave, it is recommended to follow below guideline to link the trusted libraries:
 #    1. Link sgx_trts with the `--whole-archive' and `--no-whole-archive' options,
@@ -116,7 +114,7 @@ Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,--no-undefined -nostdlib -nodefau
 	-Wl,--defsym,__ImageBase=0 \
 	-Wl,--version-script=Enclave/Enclave.lds
 
-Enclave_Cpp_Objects := $(Enclave_Cpp_Files:.cpp=.o)
+Enclave_C_Objects := $(Enclave_C_Files:.c=.o)
 
 Enclave_Name := enclave.so
 Signed_Enclave_Name := enclave.signed.so
@@ -179,7 +177,7 @@ JavaApp.class: JavaApp/JavaApp.java $(LibSgxJava_Java_Classes)
 	@echo "Gen  =>  $@"
 
 .config_$(Build_Mode)_$(SGX_ARCH):
-	@rm -f .config_* $(Java_App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(LibSgxJni_Cpp_Objects) LibSgxJni/Enclave_u.*  LibSgxJni/*.so $(Enclave_Cpp_Objects) Enclave/Enclave_t.*
+	@rm -f .config_* $(Java_App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(LibSgxJni_Cpp_Objects) LibSgxJni/Enclave_u.*  LibSgxJni/*.so $(Enclave_C_Objects) Enclave/Enclave_t.*
 	@touch .config_$(Build_Mode)_$(SGX_ARCH)
 
 
@@ -216,12 +214,12 @@ Enclave/Enclave_t.o: Enclave/Enclave_t.c
 	@$(CC) $(Enclave_C_Flags) -c $< -o $@
 	@echo "CC   <=  $<"
 
-Enclave/%.o: Enclave/%.cpp
-	@$(CXX) $(Enclave_Cpp_Flags) -c $< -o $@
-	@echo "CXX  <=  $<"
+Enclave/%.o: Enclave/%.c
+	@$(CC) $(Enclave_C_Flags) -c $< -o $@
+	@echo "CC  <=  $<"
 
-$(Enclave_Name): Enclave/Enclave_t.o $(Enclave_Cpp_Objects)
-	@$(CXX) $^ -o $@ $(Enclave_Link_Flags)
+$(Enclave_Name): Enclave/Enclave_t.o $(Enclave_C_Objects)
+	@$(CC) $^ -o $@ $(Enclave_Link_Flags)
 	@echo "LINK =>  $@"
 
 $(Signed_Enclave_Name): $(Enclave_Name)
@@ -231,4 +229,4 @@ $(Signed_Enclave_Name): $(Enclave_Name)
 .PHONY: clean
 
 clean:
-	@rm -f .config_* $(Java_App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(LibSgxJni_Cpp_Objects) $(LibSgxJava_Java_Classes) LibSgxJni/Enclave_u.* $(Enclave_Cpp_Objects) Enclave/Enclave_t.* *.so
+	@rm -f .config_* $(Java_App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(LibSgxJni_Cpp_Objects) $(LibSgxJava_Java_Classes) LibSgxJni/Enclave_u.* $(Enclave_C_Objects) Enclave/Enclave_t.* *.so

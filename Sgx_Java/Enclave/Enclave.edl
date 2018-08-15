@@ -1,11 +1,7 @@
 enclave {
 
     trusted {
-
-        /*
-         * Utilize random number generator in enclave.
-         */
-	public void ecall_sgx_read_rand([out, size = len] unsigned char *ptr, int len);
-
+        public uint64_t ecall_decrypt(uint64_t pos, uint8_t enc_b, [out, size=1] uint8_t *dec_b);
+        public uint64_t ecall_encrypt(uint64_t pos, uint8_t dec_b, [out, size=1] uint8_t *enc_b);
     };
 };

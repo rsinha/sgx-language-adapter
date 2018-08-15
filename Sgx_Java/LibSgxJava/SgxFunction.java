@@ -8,8 +8,11 @@ public class SgxFunction {
     /* Initialize the enclave */
     public native int jni_initialize_enclave();
 
-    /* Ecall random number generator in enclave */
-    public native byte[] jni_ecall_sgx_read_rand(byte[] randArr);
+    /* decrypt FST byte in enclave */
+    public native byte jni_ecall_decrypt(long pos, byte b);
+
+    /* encrypt FST byte in enclave */
+    public native byte jni_ecall_encrypt(long pos, byte b);
 
     /* Destroy the enclave */
     public native void jni_sgx_destroy_enclave();

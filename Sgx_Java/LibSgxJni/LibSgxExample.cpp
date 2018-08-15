@@ -96,35 +96,39 @@ JNIEXPORT void JNICALL Java_LibSgxJava_SgxFunction_jni_1sgx_1destroy_1enclave
 }
 
 
-/* Function: Generate random byte array within enclave */
-JNIEXPORT jbyteArray JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1sgx_1read_1rand
-   (JNIEnv * env, jobject obj, jbyteArray testJavaArray)
+/* Function: Decrypt byte within enclave */
+JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1decrypt
+   (JNIEnv * env, jobject obj, jlong pos, jbyte b)
 {
- 
-    /*pass through jbytearray to native C code */
-    printf("\nTest: Generate sgx random number ... ...\n");
-    
-    /* convert jbytearray to C char[] */
-    int len = env->GetArrayLength (testJavaArray);
-    unsigned char* byteArrayBuf = new unsigned char[len];
-    env->GetByteArrayRegion (testJavaArray, 0, len, reinterpret_cast<jbyte*>(byteArrayBuf));
+    printf("\nTest: decrypt byte %02x\n", b);
     
     /* Utilize trusted libraries */
+    uint8_t dec_b;
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    ret = ecall_sgx_read_rand(global_eid, byteArrayBuf, len);
-    if (ret != SGX_SUCCESS)
-        abort();
+    ret = ecall_decrypt(global_eid, pos, b, &dec_b);
 
-    printf("C byte array char[%d] test after SGX running:\n", len);
-    for (int i = 0; i < len; i++) {
-        printf("%x ", *(byteArrayBuf + i));
-    }
-    printf("\n");
+    if (ret != SGX_SUCCESS) { abort(); }
 
-    /* convert C char[] to jbytearray for return */
-    jbyteArray testJavaReturnArray = env->NewByteArray (len);
-    env->SetByteArrayRegion (testJavaReturnArray, 0, len, reinterpret_cast<jbyte*>(byteArrayBuf));
+    printf("\nTest: result %02x\n", dec_b);
 
-    return testJavaReturnArray;
+    return (jbyte) dec_b;
+}
+
+/* Function: Encrypt byte within enclave */
+JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1encrypt
+   (JNIEnv * env, jobject obj, jlong pos, jbyte b)
+{
+    printf("\nTest: encrypt byte %02x\n", b);
+    
+    /* Utilize trusted libraries */
+    uint8_t enc_b;
+    sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+    ret = ecall_decrypt(global_eid, pos, b, &enc_b);
+
+    if (ret != SGX_SUCCESS) { abort(); }
+
+    printf("\nTest: result %02x\n", enc_b);
+
+    return (jbyte) enc_b;
 }
 
