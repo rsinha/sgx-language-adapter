@@ -95,7 +95,7 @@ else
 endif
 Crypto_Library_Name := sgx_tcrypto
 
-Enclave_C_Files := Enclave/Enclave.c $(wildcard Enclave/Crypto/*.c)
+Enclave_C_Files := Enclave/Enclave.c
 Enclave_Include_Paths := -IInclude -IEnclave -IEnclave/Crypto -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -fstack-protector $(Enclave_Include_Paths)
 

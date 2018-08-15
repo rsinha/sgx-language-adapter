@@ -5,12 +5,14 @@
 #include "Enclave.h"
 #include "Enclave_t.h"
 
-void ecall_decrypt(uint64_t pos, uint8_t enc_b, uint8_t *dec_b)
+uint64_t ecall_decrypt(uint64_t pos, uint8_t enc_b, uint8_t *dec_b)
 {
   *dec_b = enc_b ^ 0xFF;
+  return 0;
 }
 
-void ecall_encrypt(uint64_t pos, uint8_t dec_b, uint8_t *enc_b)
+uint64_t ecall_encrypt(uint64_t pos, uint8_t dec_b, uint8_t *enc_b)
 {
   *enc_b = dec_b ^ 0xFF;
+  return 0;
 }

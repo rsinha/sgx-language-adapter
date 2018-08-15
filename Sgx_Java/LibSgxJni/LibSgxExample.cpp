@@ -100,16 +100,17 @@ JNIEXPORT void JNICALL Java_LibSgxJava_SgxFunction_jni_1sgx_1destroy_1enclave
 JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1decrypt
    (JNIEnv * env, jobject obj, jlong pos, jbyte b)
 {
-    printf("\nTest: decrypt byte %02x\n", b);
+    printf("SGX command: decrypt byte %02x\n", (uint8_t) b);
     
     /* Utilize trusted libraries */
     uint8_t dec_b;
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    ret = ecall_decrypt(global_eid, pos, b, &dec_b);
+    uint64_t ecall_ret;
+    ret = ecall_decrypt(global_eid, &ecall_ret, pos, b, &dec_b);
 
     if (ret != SGX_SUCCESS) { abort(); }
 
-    printf("\nTest: result %02x\n", dec_b);
+    printf("SGX result: %02x\n", dec_b);
 
     return (jbyte) dec_b;
 }
@@ -118,16 +119,17 @@ JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1decrypt
 JNIEXPORT jbyte JNICALL Java_LibSgxJava_SgxFunction_jni_1ecall_1encrypt
    (JNIEnv * env, jobject obj, jlong pos, jbyte b)
 {
-    printf("\nTest: encrypt byte %02x\n", b);
+    printf("SGX command: encrypt byte %02x\n", (uint8_t) b);
     
     /* Utilize trusted libraries */
     uint8_t enc_b;
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    ret = ecall_decrypt(global_eid, pos, b, &enc_b);
+    uint64_t ecall_ret;
+    ret = ecall_encrypt(global_eid, &ecall_ret, pos, b, &enc_b);
 
     if (ret != SGX_SUCCESS) { abort(); }
 
-    printf("\nTest: result %02x\n", enc_b);
+    printf("SGX result: %02x\n", enc_b);
 
     return (jbyte) enc_b;
 }
